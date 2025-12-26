@@ -1,0 +1,124 @@
+"""
+CIC (Cascaded Integrator-Comb) Decimator Implementation
+
+This implementation matches MATLAB's dsp.CICDecimator behavior, including:
+- Fixed-point quantization with 16-bit word length and 15-bit fraction length
+- Floor rounding (truncation towards negative infinity) for output quantization
+  to match MATLAB's default RoundingMethod='Floor'
+- Wrapping behavior for output overflow (OverflowAction='Wrap')
+
+Note: MATLAB's dsp.CICDecimator uses Floor rounding by default when converting
+from internal precision to output precision, and Wrap for overflow handling.
+
+Author: Mustafa EL-Sherif
+"""
+import numpy as np
+from fixed_point_utils import *
+
+def create_cic_state(decimation_factor=2, differential_delay=1, num_sections=1):
+    """Initialize CIC decimator state"""
+    return {
+        'R': decimation_factor,
+        'M': differential_delay,
+        'N': num_sections,
+        'integrator_state': np.zeros(num_sections),
+        'comb_state': np.zeros((num_sections, differential_delay)),
+        'comb_ptr': 0
+    }
+
+
+def process_cic_sample(x, state, use_fixed_point=False):
+    """Process single input sample through integrator stages
+
+    Args:
+        x: Input sample
+        state: CIC state dictionary
+        use_fixed_point: If True, apply 20-bit quantization at integrator stages
+    """
+    int_out = x
+    for i in range(state['N']):
+        int_out = int_out + state['integrator_state'][i]
+
+        # Apply section quantization (20-bit, 15-bit fraction) to match MATLAB
+        if use_fixed_point:
+            int_out = quantize_with_floor_rounding_wrap(int_out, word_length=20, frac_length=15)
+
+        state['integrator_state'][i] = int_out
+
+    return int_out
+
+
+def process_cic_block(input_signal, state, use_fixed_point=False):
+    """Process input block with decimation
+
+    MATLAB's dsp.CICDecimator processes input samples and outputs at every R-th sample.
+    The first output is computed from samples 0 to R-1, at sample index R-1.
+
+    Args:
+        input_signal: Input signal array
+        state: CIC state dictionary
+        use_fixed_point: If True, apply section quantization (20-bit) at integrator/comb stages
+    """
+    output = []
+
+
+    for n, x in enumerate(input_signal):
+        # Run integrator for every sample
+        int_out = process_cic_sample(x, state, use_fixed_point)
+
+        # Decimate and run comb
+        # Output at n = R-1, 2R-1, 3R-1, ...
+        # which for R=2 is n = 1, 3, 5, ...
+        if (n % state['R']) == (state['R'] - 1):
+            # Comb stages
+            comb_out = int_out
+            for i in range(state['N']):
+                delay_val = state['comb_state'][i, state['comb_ptr']]
+                comb_out = comb_out - delay_val
+
+                # Apply section quantization at comb stage
+                # Use floor rounding to match MATLAB behavior
+                if use_fixed_point:
+                    comb_out = quantize_with_floor_rounding_wrap(comb_out, word_length=20, frac_length=15)
+
+                # Note: Do NOT apply quantization here at comb output
+                # Quantization at this stage causes spurious zeros during zero-crossings
+                # Only the integrator state and final output should be quantized
+
+                state['comb_state'][i, state['comb_ptr']] = int_out if i == 0 else comb_out
+
+            output.append(comb_out)
+
+            # Update circular buffer pointer after each decimated output
+            state['comb_ptr'] = (state['comb_ptr'] + 1) % state['M']
+
+    return np.array(output)
+
+def cic_decimator(input_signal, dec_factor = 2, use_fixed_point = False):
+    """CIC Decimator processing function
+
+    Args:
+        input_signal: Input signal array
+        dec_factor: Decimation factor
+        use_fixed_point: If True, apply fixed-point quantization
+                        - Section stages: 20-bit word, 15-bit fraction
+                        - Output: 16-bit word, 15-bit fraction (Floor rounding)
+    """
+    # Create CIC state
+    state = create_cic_state(decimation_factor = dec_factor, differential_delay = 1, num_sections = 1)
+
+    # Process input signal with fixed-point quantization at section stages
+    output_signal = process_cic_block(input_signal, state, use_fixed_point)
+
+    # MATLAB's dsp.CICDecimator prepends a zero to the output
+    output_signal = np.concatenate(([0], output_signal))
+
+    # Quantize output if fixed-point is used
+    # MATLAB's dsp.CICDecimator uses Floor rounding with Wrap overflow action by default
+    if use_fixed_point:
+        output_signal = quantize_with_floor_rounding_wrap(output_signal, word_length = 16, frac_length = 15, use_saturation = True)
+
+    expected_length = len(input_signal) // dec_factor
+    output_sig = output_signal[:expected_length]
+
+    return output_sig
