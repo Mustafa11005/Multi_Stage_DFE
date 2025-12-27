@@ -1435,7 +1435,9 @@ endmodule
 |-------------|------|---------|
 | **Mustafa El-Sherif** | Project Lead | [@Mustafa11005](https://github.com/Mustafa11005) |
 | **Amira El-Komy** | Core Contributor & vice-Lead | [@amira630](https://github.com/amira630) |
-| **Omar Ayoub** | Contributor | [@xomarnasser29](https://github.com/xomarnasser29) |
+| **Omar Ayoub** | Core Contributor | [@xomarnasser29](https://github.com/xomarnasser29) |
+| **Shahd Ismail** | Member | - |
+| **Hazem Saber** | Member | - |
 
 ---
 
