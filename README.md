@@ -98,7 +98,7 @@ This system performs the following transformations on incoming digital signals:
 ### Multi-Stage Processing Pipeline
 
 - **Fractional Polyphase Decimator**  
-  72-tap FIR implementation utilizing polyphase decomposition for computational efficiency  
+  146-tap FIR implementation utilizing polyphase decomposition for computational efficiency  
   Achieves 9 MHz → 6 MHz conversion with minimal passband distortion
 
 - **Cascaded IIR Notch Filter Bank**  
@@ -112,7 +112,7 @@ This system performs the following transformations on incoming digital signals:
 
 - **AMBA APB Control Interface**  
   Industry-standard peripheral bus interface providing:
-  - Coefficient memory access (72 FIR + 15 IIR coefficients)
+  - Coefficient memory access (146 FIR & IIR coefficients included)
   - Runtime configuration control
   - System status and health monitoring
   - Output multiplexing and stage bypass controls
@@ -144,7 +144,7 @@ graph LR
   %% Signal Processing Chain
   subgraph DFE["DFE Filter Processing Chain"]
     direction LR
-    in[/"Input Signal<br/>9 MHz s16.15"/] --> FD["Stage 1: Fractional Decimator<br/>9→6 MHz<br/>72-tap Polyphase FIR"]
+    in[/"Input Signal<br/>9 MHz s16.15"/] --> FD["Stage 1: Fractional Decimator<br/>9→6 MHz<br/>146-tap Polyphase FIR"]
     FD --> IIR1["Stage 2: IIR Notch<br/>2.4 MHz Rejection"]
     IIR1 --> IIR2["Stage 3: IIR Notch<br/>1.0 MHz Rejection"]
     IIR2 --> IIR3["Stage 4: IIR Notch<br/>2.0 MHz Rejection"]
@@ -157,7 +157,7 @@ graph LR
     direction TB
     APB["APB Slave Interface<br/>(AMBA-Compliant)"] 
     REG["Control Register Bank<br/>• Enable Controls<br/>• Output Selection<br/>• Decimation Config"]
-    CMEM["Coefficient Memory<br/>• FIR Coefficients [72]<br/>• IIR Coefficients [15]<br/>• Runtime Updatable"]
+    CMEM["Coefficient Memory<br/>• FIR Coefficients [146]<br/>• IIR Coefficients [15]<br/>• Runtime Updatable"]
   end
 
   %% Status and Monitoring
@@ -393,7 +393,7 @@ MATLAB/
 ├── System_run.m                    # Multi-test-case signal loader, propagation, and metrics summary
 │
 ├── Filter Definitions (Fixed-Point)
-│   ├── Fractional_Decimator.m      # 72-tap polyphase FIR (9→6 MHz)
+│   ├── Fractional_Decimator.m      # 146-tap polyphase FIR (9→6 MHz)
 │   ├── IIR_2_4.m                   # 2.4 MHz notch filter
 │   ├── IIR_1.m                     # 1.0 MHz notch filter
 │   ├── IIR_2.m                     # 2.0 MHz notch filter
@@ -563,7 +563,7 @@ Python_Script/
 │
 └── Configuration & Coefficients
     ├── cfg.txt                     # Binary configuration bitstream
-    ├── fractional_decimator_coeff.txt  # FIR coefficients (72 taps)
+    ├── fractional_decimator_coeff.txt  # FIR coefficients (146 taps)
     ├── iir_24_coeff.txt            # 2.4 MHz notch coefficients
     ├── iir_5_1_coeff.txt           # 5 MHz notch #1 coefficients
     └── iir_5_2_coeff.txt           # 5 MHz notch #2 coefficients
@@ -814,7 +814,7 @@ vsim -voptargs=+acc work.DFE_tb -cover -l sim.log
 | `DATA_FRAC` | 15 bits | Fractional bits in data (s16.15) |
 | `COEFF_WIDTH` | 20 bits | Coefficient word length |
 | `COEFF_FRAC` | 18 bits | Fractional bits in coefficients (s20.18) |
-| `N_TAP` | 146 | Total coefficient storage (72 FIR + 15 IIR + margin) |
+| `N_TAP` | 146 | Total coefficient storage (146 FIR) |
 
 #### Simulation Execution
 
