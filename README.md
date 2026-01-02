@@ -121,10 +121,10 @@ This system performs the following transformations on incoming digital signals:
 
 The design employs carefully optimized fixed-point representations:
 
-| Signal Path | Format | Range | Resolution |
-| ------------ | -------- | ------- | ------------ |
-| Data Path | s16.15 | ±1.0 | 30.5 μV |
-| Coefficients | s20.18 | ±2.0 | 3.8 μV |
+| Signal Path         | Format | Range    | Resolution        |
+|-----------------|-------|----------|-------------------|
+| Data Path       | s16.15 | ±1.0     | 30.5 μV           |
+| Coefficients    | s20.18 | ±2.0     | 3.8 μV            |
 | Internal Accumulation | Stage Dependant | Extended | Platform-dependent |
 
 This numerical architecture ensures:
@@ -220,19 +220,19 @@ graph LR
 
 The complete memory-mapped register interface provides comprehensive control and monitoring capabilities.
 
-| Address Range | Register Identifier              | Width    | Access | Description                                          |
-|---------------|----------------------------------|----------|--------|------------------------------------------------------|
-| `0x0000-0x0047` | `FRAC_DECI_COEFF[0:71]`       | 20-bit   | RW     | Fractional decimator FIR coefficients (s20.18)       |
-| `0x0048-0x004C` | `IIR_24_COEFF[0:4]`           | 20-bit   | RW     | 2.4 MHz notch filter coefficients (s20.18)           |
-| `0x004D-0x0051` | `IIR_1_COEFF[0:4]`            | 20-bit   | RW     | 1.0 MHz notch filter coefficients (s20.18)           |
-| `0x0052-0x0056` | `IIR_2_COEFF[0:4]`            | 20-bit   | RW     | 2.0 MHz notch filter coefficients (s20.18)           |
-| `0x0057`        | `CIC_DEC_FACTOR`              | 5-bit    | RW     | CIC decimation factor (1, 2, 4, 8, 16)               |
-| `0x0058-0x005C` | `STAGE_ENABLE[0:4]`           | 1-bit    | RW     | Per-stage enable control (5 stages)                  |
-| `0x005D`        | `OUTPUT_MUX_SEL`              | 2-bit    | RW     | Output stage selection (00=bypass, 01=frac, 10=iir, 11=cic) |
-| `0x005E`        | `COEFF_MUX_SEL`               | 3-bit    | RW     | Coefficient readback multiplexer control             |
-| `0x005F`        | `SYSTEM_STATUS`               | 8-bit    | RO     | System health and operational status flags           |
-| `0x0060`        | `ERROR_FLAGS`                 | 8-bit    | RO     | Error condition indicators (overflow/underflow)      |
-| `0x0061`        | `VERSION_ID`                  | 16-bit   | RO     | Hardware version identifier                          |
+| Address Range   | Register Identifier              | Width    | Access | Description                                                 |
+|-----------------|----------------------------------|----------|--------|-------------------------------------------------------------|
+| `0x0000-0x0047` | `FRAC_DECI_COEFF[0:71]`          | 20-bit   | RW     | Fractional decimator FIR coefficients (s20.18)              |
+| `0x0048-0x004C` | `IIR_24_COEFF[0:4]`              | 20-bit   | RW     | 2.4 MHz notch filter coefficients (s20.18)                  |
+| `0x004D-0x0051` | `IIR_1_COEFF[0:4]`               | 20-bit   | RW     | 1.0 MHz notch filter coefficients (s20.18)                  |
+| `0x0052-0x0056` | `IIR_2_COEFF[0:4]`               | 20-bit   | RW     | 2.0 MHz notch filter coefficients (s20.18)                  |
+| `0x0057`        | `CIC_DEC_FACTOR`                 | 5-bit    | RW     | CIC decimation factor (1, 2, 4, 8, 16)                      |
+| `0x0058-0x005C` | `STAGE_ENABLE[0:4]`              | 1-bit    | RW     | Per-stage enable control (5 stages)                         |
+| `0x005D`        | `OUTPUT_MUX_SEL`                 | 2-bit    | RW     | Output stage selection (00=bypass, 01=frac, 10=iir, 11=cic) |
+| `0x005E`        | `COEFF_MUX_SEL`                  | 3-bit    | RW     | Coefficient readback multiplexer control                    |
+| `0x005F`        | `SYSTEM_STATUS`                  | 8-bit    | RO     | System health and operational status flags                  |
+| `0x0060`        | `ERROR_FLAGS`                    | 8-bit    | RO     | Error condition indicators (overflow/underflow)             |
+| `0x0061`        | `VERSION_ID`                     | 16-bit   | RO     | Hardware version identifier                                 |
 
 **Access Modes:** RW = Read/Write, RO = Read-Only
 
@@ -244,27 +244,27 @@ Comprehensive characterization demonstrates exceptional signal processing perfor
 
 ### Signal Processing Performance
 
-| Parameter | Specification | Measured Performance |
-|-----------|--------------|---------------------|
-| Input Sample Rate | 9.0 MHz | 9.0 MHz |
-| Output Sample Rate (base) | 6.0 MHz | 6.0 MHz |
-| Output Sample Rate (CIC) | 6.0 MHz / D | Configurable |
-| Stopband Attenuation | ≥ 80 dB | **81.754 dB** |
-| Notch Depth (all filters) | ≥ 50 dB | **60.61 dB** |
-| Passband Ripple | ≤ 0.25 dB | **0.2145 dB Peak-to-Peak** |
-| Processing Latency | < 200 µs | **1.2 µs IDEAL case** |
-| Signal-to-Noise Ratio (SNR) | ≥ 60 dB | **MIN. of 75.06 dB** |
+| Parameter                   | Specification | Measured Performance        |
+|-----------------------------|---------------|-----------------------------|
+| Input Sample Rate           | 9.0 MHz       | 9.0 MHz                     |
+| Output Sample Rate (base)   | 6.0 MHz       | 6.0 MHz                     |
+| Output Sample Rate (CIC)    | 6.0 MHz / D   | Configurable                |
+| Stopband Attenuation        | ≥ 80 dB       | **81.754 dB**               |
+| Notch Depth (all filters)   | ≥ 50 dB       | **60.61 dB**                |
+| Passband Ripple             | ≤ 0.25 dB     | **0.2145 dB Peak-to-Peak**  |
+| Processing Latency          | < 200 µs      | **1.2 µs IDEAL case**       |
+| Signal-to-Noise Ratio (SNR) | ≥ 60 dB       | **MIN. of 75.06 dB**        |
 
 ### Digital Implementation Characteristics
 
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| Data Word Length | 16 bits | Signed fixed-point (s16.15) |
-| Coefficient Word Length | 20 bits | Signed fixed-point (s20.18) |
-| Internal Precision | Stage Dependant | Extended accumulator width |
-| Clock Frequency (typical) | 9 MHz | Can reach ~200 MHz |
-| Arithmetic Mode | Convergent Rounding | Zero mean error |
-| Overflow Handling | Saturation | Prevents wrap-around artifacts |
+| Parameter                 | Value                 | Notes                          |
+|---------------------------|-----------------------|--------------------------------|
+| Data Word Length          | 16 bits               | Signed fixed-point (s16.15)    |
+| Coefficient Word Length   | 20 bits               | Signed fixed-point (s20.18)    |
+| Internal Precision        | Stage Dependant       | Extended accumulator width     |
+| Clock Frequency (typical) | 9 MHz                 | Can reach ~200 MHz             |
+| Arithmetic Mode           | Convergent Rounding   | Zero mean error                |
+| Overflow Handling         | Saturation            | Prevents wrap-around artifacts |
 
 ---
 
@@ -274,16 +274,16 @@ Comprehensive characterization demonstrates exceptional signal processing perfor
 
 The DFE Filter Array has undergone rigorous multi-level verification to ensure functional correctness, performance compliance, and production readiness.
 
-| Verification Phase | Status | Tool/Methodology | Coverage Metrics |
-|-------------------|:------:|------------------|------------------|
-| RTL Linting | ✅ **PASSED** | Custom Linter / STARC | **100%** rule compliance, 0 errors, 0 warnings |
-| Functional Simulation | ✅ **PASSED** | QuestaSim | Directed + constrained-random testbenches |
-| Code Coverage | ✅ **PASSED** | QuestaSim | >98% line, >95% branch, >92% FSM coverage |
-| Performance Validation | ✅ **PASSED** | MATLAB / Python | All specifications met or exceeded |
-| Synthesis | ✅ **PASSED** | Vivado | Timing clean @ target frequency |
-| Gate-Level Simulation | ⏳ **TBD** | - | - |
-| Static Timing Analysis | ⏳ **TBD** | - | - |
-| Formal Verification | ⏳ **TBD** | - | - |
+| Verification Phase       | Status           | Tool/Methodology    | Coverage Metrics                                |
+|--------------------------|-----------------|-----------------------|-------------------------------------------------|
+| RTL Linting              | ✅ **PASSED**        | Custom Linter / STARC | **100%** rule compliance, 0 errors, 0 warnings |
+| Functional Simulation    | ✅ **PASSED**    | QuestaSim           | Directed + constrained-random testbenches      |
+| Code Coverage            | ✅ **PASSED**    | QuestaSim           | >98% line, >95% branch, >92% FSM coverage      |
+| Performance Validation   | ✅ **PASSED**    | MATLAB / Python     | All specifications met or exceeded             |
+| Synthesis                | ✅ **PASSED**    | Vivado              | Timing clean @ target frequency                |
+| Gate-Level Simulation    | ⏳ **TBD**       | -                   | -                                              |
+| Static Timing Analysis   | ⏳ **TBD**       | -                   | -                                              |
+| Formal Verification      | ⏳ **TBD**       | -                   | -                                              |
 
 ### Testbench Architecture
 
@@ -332,11 +332,11 @@ The entire RTL codebase has been subjected to rigorous **STARC (Semiconductor Te
 
 #### Compliance Results
 
-| Metric | Result | Industry Benchmark |
-|--------|--------|-------------------|
-| **Total Rules Checked** | 234 | STARC 2.1.3 Standard |
-| **Violations (Errors)** | **0** | Target: 0 |
-| **Code Review Sign-off** | **Approved** | Manual inspection |
+| Metric                  | Result        | Industry Benchmark   |
+|------------------------|---------------|----------------------|
+| **Total Rules Checked** | 234           | STARC 2.1.3 Standard |
+| **Violations (Errors)** | **0**         | Target: 0            |
+| **Code Review Sign-off**| **Approved**  | Manual inspection    |
 
 **Certification:** This design meets **production ASIC/FPGA release criteria** and is suitable for tape-out workflows, safety-critical applications, and long-lifecycle commercial products.
 
