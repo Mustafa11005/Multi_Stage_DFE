@@ -1,3 +1,4 @@
+
 """
 Python implementation of MATLAB System_run_VOL2.m
 Digital Filter Engine (DFE) - Signal Processing Pipeline
@@ -19,6 +20,15 @@ from fixed_point_utils import *
 from fractional_decimator import *
 from iir_notch_filter import *
 from cic import *
+
+# Global path configuration macros
+################################################################
+# Testbench Path I  : ../FPGA_Flow_SRC
+# Testbench Path II : ../ASIC_Flow/RTL_SRC
+# MATLAB Path       : ../MATLAB
+TESTBENCH_OUTPUT_PATH = '../ASIC_Flow/RTL_SRC'
+MATLAB_OUTPUT_PATH = r'../MATLAB'
+################################################################
 
 def generate_signal(signal_shape, amplitude, frequency, time_array):
     """Generate clean signal based on selected shape"""
@@ -110,9 +120,9 @@ def main():
     config_file = 'cfg.txt'
     config = read_binary_config(config_file)
 
-    # Set output paths: testbench location and MATLAB directory
-    output_base_path = '../FPGA_Flow_SRC'
-    output_base_path_matlab = r'../MATLAB'
+    # Use global path configuration macros
+    output_base_path = TESTBENCH_OUTPUT_PATH
+    output_base_path_matlab = MATLAB_OUTPUT_PATH
 
     # Create both output directories if they don't exist
     os.makedirs(output_base_path, exist_ok=True)
@@ -754,4 +764,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
